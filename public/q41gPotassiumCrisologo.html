@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Movie Rater !</title>
+    
+    <link rel="icon" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Sora:wght@100..800&display=swap" rel="stylesheet">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Tala Crisologo">
+</head>
+
+<style>
+
+    *{
+        font-family: 'Sora', sans-serif;
+        background-color: #FFF2EF;
+    }
+    h1, label{
+        text-align: center;
+
+    }
+    fieldset{
+        width: 40%;
+        padding: 25px;
+        margin: auto;
+        border: 2px solid #5D688A;
+        border-radius: 5px;
+        font-size: 18px;
+    }
+    .changecol{
+        color: #FACE68;
+    }
+    
+    #movlistDisplay {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #movlistDisplay li {
+        border: 2px solid #5D688A;
+        border-radius: 5px;
+        padding: 15px;
+        background-color: #FFF2EF;
+        list-style: none;
+        margin-bottom: 10px;
+        width: 90%;
+        max-width: 600px;
+    }
+
+    .stars {
+        color: #FACE68;
+        font-size: 18px;
+    }
+
+    input[type="text"], select, button {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 14px;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #5D688A;
+    }
+
+    button{
+        background-color: #5D688A;
+        color: #FFF2EF;
+    }
+
+
+</style>
+<body>
+
+<h1>Add a Movie</h1>
+
+<form id="movlist">
+<fieldset>
+
+    <label for="title">Title:</label><br>
+    <input type="text" id="title" name="title"><br><br>
+
+    <label for="year">Year:</label><br>
+    <input type="text" id="year" name="year"><br><br>
+
+    <label for="genre">Genre:</label><br>
+    <select name="genre" id="genre">
+        <option value="Action">Action</option>
+        <option value="Drama">Drama</option>
+        <option value="Romance">Romance</option>
+        <option value="Comedy">Comedy</option>
+    </select><br><br>
+
+    <label for="rating">Rating:</label><br>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        
+    <br><br><button type="submit">Add a Movie</button>
+
+    <h2>Movie List</h2>
+    <div id="movlistDisplay"></div>
+
+</fieldset>
+</form>
+
+<script>
+
+// star rating stuff
+    const stars = document.querySelectorAll(".fa-star");
+    let rating = 0; 
+    stars.forEach(function(star, i) {    // loops thru each star
+        star.addEventListener("click", function(){
+
+            rating = i + 1; // wala lang rating lang
+
+            stars.forEach(function(s, j){ // checks all stars after click
+                if(j <= i){ //b4 or =, it turns yellow
+                    s.classList.add("changecol")
+                }
+                else{
+                    s.classList.remove("changecol")
+                }
+            } );
+        } );
+    } );
+;
+
+const form = document.getElementById('movlist');
+const movielist = document.getElementById("movlistDisplay");
+
+// shows the movies
+function dispMov() {
+    const movies = JSON.parse(localStorage.getItem("movies")) || [];
+    movielist.innerHTML = "";
+
+    movies.forEach(movie => {
+        const li = document.createElement("li");
+        li.innerHTML = `${movie.title} (${movie.year}) - ${movie.genre}, Rating: <span class="stars">${"★".repeat(movie.rating)}${"☆".repeat(5 - movie.rating)}</span>`;
+        movielist.appendChild(li);
+    });
+}
+
+// show after page reload
+dispMov();
+
+// gets stuff from form
+form.addEventListener('submit', function(e) {
+    e.preventDefault(); 
+
+    const title = document.getElementById('title').value;
+    const year = document.getElementById('year').value;
+    const genre = document.getElementById('genre').value;
+    const movie = { title, year, genre, rating };
+
+    // saves data to locstore
+    const movieList = JSON.parse(localStorage.getItem("movies")) || []; //if nothing in storage edi null
+    movieList.push(movie);
+    localStorage.setItem("movies", JSON.stringify(movieList));
+
+    // update the list
+    dispMov();
+
+    // reset stuff 
+    form.reset();
+    rating = 0;
+    stars.forEach(function(s) {
+        s.classList.remove("changecol");
+
+    } );
+} ); 
+</script>
+
+
+</body>
+</html>
