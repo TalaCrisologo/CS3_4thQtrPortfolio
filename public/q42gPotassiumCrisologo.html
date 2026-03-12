@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Movie Rater !</title>
+    
+    <link rel="icon" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Sora:wght@100..800&display=swap" rel="stylesheet">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Tala Crisologo">
+</head>
+
+<style>
+    *{
+        font-family: 'Sora', sans-serif;
+        background-color: #FFF2EF;
+    }
+    h1, label{
+        text-align: center;
+
+    }
+    fieldset{
+        width: 40%;
+        padding: 25px;
+        margin: auto;
+        border: 2px solid #5D688A;
+        border-radius: 5px;
+        font-size: 18px;
+    }
+    .changecol{
+        color: #FACE68;
+    }
+    
+    #movlistDisplay {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #movlistDisplay li {
+        border: 2px solid #5D688A;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #FFF2EF;
+        list-style: none;
+        margin-bottom: 10px;
+        width: 90%;
+        max-width: 600px;
+    }
+
+    .stars {
+        color: #FACE68;
+        font-size: 18px;
+    }
+
+    input[type="text"], select, button {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 14px;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #5D688A;
+    }
+
+    button{
+        background-color: #5D688A;
+        color: #FFF2EF;
+    }
+
+    .delete-btn{
+    width: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-left: 10px;
+    background-color: #5D688A;
+    color: #FFF2EF;
+}
+
+
+</style>
+<body>
+
+<h1>Add a Movie</h1>
+
+<form id="movlist">
+<fieldset>
+
+    <label for="title">Title:</label><br>
+    <input type="text" id="title" name="title"><br><br>
+
+    <label for="year">Year:</label><br>
+    <input type="text" id="year" name="year"><br><br>
+
+    <label for="genre">Genre:</label><br>
+    <select name="genre" id="genre">
+        <option value="Action">Action</option>
+        <option value="Drama">Drama</option>
+        <option value="Romance">Romance</option>
+        <option value="Comedy">Comedy</option>
+    </select><br><br>
+
+    <label for="rating">Rating:</label><br>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span>
+        
+    <br><br><button type="submit">Add a Movie</button>
+
+    <h2>Movie List</h2>
+    <div id="movlistDisplay"></div>
+    
+
+</fieldset>
+</form>
+
+<script>
+// star rating
+const stars = document.querySelectorAll(".fa-star");
+let rating = 0;
+
+stars.forEach(function(star, i){ //loops thru each star
+    star.addEventListener("click", function(){
+        rating = i + 1;
+
+        stars.forEach(function(s, j){ // checks all stars after click
+            if (j <= i){ //b4 or =, it turns yellow
+                s.classList.add("changecol");
+            }
+            else{
+                s.classList.remove("changecol");
+            }
+        });
+    });
+});
+
+// actually displaying movies 
+const form = document.getElementById('movlist');
+const movielist = document.getElementById('movlistDisplay')
+
+function dispMov(){
+    const movies = JSON.parse(localStorage.getItem("movies")) || [];
+    movielist.innerHTML = ""; // clears movie list
+
+    movies.forEach(function(movie, index){
+        const li = document.createElement("li");
+
+        // ave rating
+        const aveR = movie.totR / movie.countR;
+
+        // round for stars
+        const rounded = Math.round(aveR);
+
+        li.innerHTML = `${movie.title} (${movie.year}) - ${movie.genre}, Rating: <span class="stars">${"★".repeat(rounded)}${"☆".repeat(5 - rounded)} (${aveR.toFixed(1)})</span>`;
+
+        // delete btn 
+        const delBtn = document.createElement("button");
+        delBtn.classList.add("delete-btn");
+        delBtn.textContent = "Delete";
+        delBtn.onclick = function(){
+            if (confirm("Are you sure you want to delete this movie?")) {
+            delMov(index);
+            }
+        };
+
+        li.appendChild(delBtn);
+        movielist.appendChild(li);
+    });
+}
+
+// delete fcn
+function delMov(index){
+    const movies = JSON.parse(localStorage.getItem("movies")) || [];
+    movies.splice(index, 1); // removes movie @ index pos
+    localStorage.setItem("movies", JSON.stringify(movies));
+    dispMov();
+}
+
+// displays when pg loads
+dispMov();
+
+// form submit stuff
+form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const title = document.getElementById('title').value.trim();
+    const year = document.getElementById('year').value;
+    const genre = document.getElementById('genre').value;
+    const movieList = JSON.parse(localStorage.getItem("movies")) || [];
+    let movieFound = false;
+
+    for(let i = 0; i < movieList.length; i++){
+        if (movieList[i].title.trim().toLowerCase() === title.toLowerCase()) { // generalizes the titles para ez
+
+            // updates the movie if movie acc exists
+            movieList[i].totR += rating;
+            movieList[i].countR += 1;
+            movieList[i].year = year;
+            movieList[i].genre = genre;
+            movieFound = true;
+            break;
+        }
+    }
+
+    if(!movieFound){
+        const movie = {
+            title: title,
+            year: year,
+            genre: genre,
+            totR: rating,
+            countR: 1
+        };
+        movieList.push(movie);
+    }
+
+    localStorage.setItem("movies", JSON.stringify(movieList));
+    dispMov();
+
+    // resets form
+    form.reset();
+    rating = 0;
+
+    stars.forEach(function(s) {
+        s.classList.remove("changecol");
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<script>
+    // STAR RATING INPUT
+const stars = document.querySelectorAll(".fa-star");
+let rating = 0;
+
+stars.forEach(function(star, i) {
+    star.addEventListener("click", function() {
+
+        rating = i + 1;
+
+        stars.forEach(function(s, j) {
+            if (j <= i) {
+                s.classList.add("changecol");
+            } else {
+                s.classList.remove("changecol");
+            }
+        });
+
+    });
+});
+
+const form = document.getElementById('movlist');
+const movielist = document.getElementById("movlistDisplay");
+
+
+// DISPLAY MOVIES
+function dispMov() {
+
+    const movies = JSON.parse(localStorage.getItem("movies")) || [];
+    movielist.innerHTML = "";
+
+    movies.forEach(function(movie, index) {
+
+        const li = document.createElement("li");
+
+        // calculate average rating
+        const avgRating = movie.totalRating / movie.ratingCount;
+
+        // round for star display
+        const rounded = Math.round(avgRating);
+
+        li.innerHTML =
+        movie.title + " (" + movie.year + ") - " + movie.genre +
+        ", Rating: <span class='stars'>" +
+        "★".repeat(rounded) +
+        "☆".repeat(5 - rounded) +
+        " (" + avgRating.toFixed(1) + ")" +
+        "</span>";
+
+        // DELETE BUTTON
+        const deleteB = document.createElement("button");
+        deleteB.textContent = "Delete";
+
+        deleteB.onclick = function() {
+            deleteMovie(index);
+        };
+
+        li.appendChild(deleteB);
+        movielist.appendChild(li);
+
+    });
+}
+
+
+// DELETE FUNCTION
+function deleteMovie(index) {
+
+    const movies = JSON.parse(localStorage.getItem("movies")) || [];
+
+    movies.splice(index, 1);
+
+    localStorage.setItem("movies", JSON.stringify(movies));
+
+    dispMov();
+}
+
+
+// SHOW MOVIES WHEN PAGE LOADS
+dispMov();
+
+
+// FORM SUBMIT
+form.addEventListener('submit', function(e) {
+
+    e.preventDefault();
+
+    const title = document.getElementById('title').value.trim();
+    const year = document.getElementById('year').value;
+    const genre = document.getElementById('genre').value;
+
+    const movieList = JSON.parse(localStorage.getItem("movies")) || [];
+
+    let movieFound = false;
+
+    for (let i = 0; i < movieList.length; i++) {
+
+        if (movieList[i].title.trim().toLowerCase() === title.toLowerCase()) {
+
+            // UPDATE EXISTING MOVIE
+            movieList[i].totalRating += rating;
+            movieList[i].ratingCount += 1;
+
+            movieList[i].year = year;
+            movieList[i].genre = genre;
+
+            movieFound = true;
+            break;
+        }
+    }
+
+    // ADD NEW MOVIE
+    if (!movieFound) {
+
+        const movie = {
+            title: title,
+            year: year,
+            genre: genre,
+            totalRating: rating,
+            ratingCount: 1
+        };
+
+        movieList.push(movie);
+    }
+
+    localStorage.setItem("movies", JSON.stringify(movieList));
+
+    dispMov();
+
+    // RESET FORM
+    form.reset();
+    rating = 0;
+
+    stars.forEach(function(s) {
+        s.classList.remove("changecol");
+    });
+
+});
+</script>
