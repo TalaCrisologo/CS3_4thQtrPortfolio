@@ -57,17 +57,23 @@
 
 - Guided Question: What changed compared to the default static positioning? Try to give different values to top and left or you can change it to bottom, right.
 
+- Answer: The sidebar moved right and down, creating a 20px space between the top and right sides of the screen.
+
 ### Step 2 (Fixed):
 
 - Add in css ```position: fixed; bottom: 0; width: 100%;``` to .footer.
 
 - Guided Question: What happens when you scroll the page? Why does the footer behave differently from position relative?
 
+-Answer: When we fix the position of an element, it stays on that area of the screen regardless of scrolling or screen size. Since we fixed the footer at the bottom, it can still be seen even if I scroll up or down.
+
 ### Step 3 (Absolute):
 
 - Add in css ```position: absolute; top: 66px; left: 200px;``` to .content.
 
 - Guided Question: What is the effect of position: absolute on an element? How is it different from fixed?
+
+-Answer: Position: absolute positions an element according to its parent element. In this case, it is the body. It is different from fixed, which positions according to the viewport/page itself.
 
 ### Step 4 : (Absolute)
 
@@ -97,8 +103,16 @@
 
     a. Could you summarize the differences between the CSS position values (static, relative, absolute, fixed)? 
 
+    - static: normal flow/order
+    - relative: space is left in its original position but the actual content/element can be moved
+    - absolute: relative/based on its parent element
+    - fixed: based on viewport/screen
+
     b. How does absolute positioning depend on its parent element?
+    - absolute positioning is affected by the properties and position of its parent element (ex. margin, padding, etc).
 
     c. How do you differentiate sticky from fixed (you can research on sticky)?
+    - sticky starts at a certain position and, when scrolled, starting at a certain point, it will stay at a predetermined position
 
     d. If you were designing a webpage for a school event, how might you use positioning to highlight important information? Please give concrete examples.
+    - I would use position: fixed or position: sticky to keep very, very important information. I would use position: absolute or position: relative (ex. for a sidebar.)
